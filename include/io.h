@@ -16,35 +16,32 @@
 #define IO_INPUT_ACTIVE (0)
 #define IO_INPUT_INACTIVE (1)
 
+//--- types ------------------------------------------------------------------
+
 /**
  * Digital Inputs
  **/
-typedef enum _IO_Inputs
+enum IO_Inputs
 {
   IO_KEY_LEFT = 0,
   IO_KEY_RIGHT_N,
   IO_KEY_MODE_N,
 
   IO_Inputs_Max
-} IO_Inputs;
+};
 
 //--- functions --------------------------------------------------------------
 
-// /**
-//  * Sets logical state of output.
-//  *
-//  * This function sets the logical state of a digital output. The physical
-//  * state is computed internally. Outputs with inverted logic (active low)
-//  * drive '0' when they are active and '1' otherwise.
-//  *
-//  * @param  state   IN  True: Output is activated, False: Output is deactivated.
-//  **/
-// void IO_SetEnIO( Bool state );
-// void IO_SetEnLpIo( Bool state );
-// void IO_SetEnLpCore( Bool state );
-// void IO_SetPwrReset( Bool state );
-// void IO_SetPmcPwrOk( Bool state );
-// void IO_SetDebugLED( Bool state );
+/**
+ * Sets logical state of output.
+ *
+ * This function sets the logical state of a digital output. The physical
+ * state is computed internally. Outputs with inverted logic (active low)
+ * drive '0' when they are active and '1' otherwise.
+ *
+ * @param  state   IN  True: Output is activated, False: Output is deactivated.
+ **/
+void IO_SetDebugLED(bool state);
 
 /**
  * Force event report of digital input.

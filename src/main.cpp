@@ -1,3 +1,5 @@
+//--- includes ---------------------------------------------------------------
+
 #include <Arduino.h>
 #include <EEPROM.h>
 #include <Servo.h>
@@ -5,7 +7,9 @@
 #include "simpleos.h"
 #include "io.h"
 
-// types
+#include "main.h" // own header file
+
+//--- types -------------------------------------------------------------------
 
 enum state_t
 {
@@ -13,19 +17,26 @@ enum state_t
   TEACHIN
 };
 
-// constants
-
-// static const int KEY_MODE_PIN = 4;
+//--- constants --------------------------------------------------------------
 
 static const int SERVO_STEP = 1;
 static const int SERVO_STEP_RUN = 3;
+static const int SERVO_MAX_ANGLE = 45;
 
-// variables
+//--- variables --------------------------------------------------------------
 
 static state_t state = OPERATIONAL;
 static Servo myservo;
 static int current_pos = 90;
 static int set_pos = 90;
+
+//--- local functions --------------------------------------------------------
+
+static void setServoPos(int pos)
+{
+  current_pos = constrain(pos, SERVO_MAX_ANGLE, 180 - SERVO_MAX_ANGLE);
+  myservo.write(current_pos);
+}
 
 static state_t stateTeachin(const SOS_Message *pMsg)
 {
@@ -45,21 +56,16 @@ static state_t stateTeachin(const SOS_Message *pMsg)
     break;
 
   case Evt_KeyLeft:
-    current_pos += SERVO_STEP;
-    current_pos = constrain(current_pos, 15, 180 - 15);
-    myservo.write(current_pos);
+    setServoPos(current_pos + SERVO_STEP);
     break;
 
   case Evt_KeyRight:
-    current_pos -= SERVO_STEP;
-    current_pos = constrain(current_pos, 15, 180 - 15);
-    myservo.write(current_pos);
+    setServoPos(current_pos - SERVO_STEP);
     break;
 
-  case Evt_TickerLED:
-    // LED Toggle
+  case Evt_TickerLED: // Toggle LED to indicate trach in mode
     on = !on;
-    digitalWrite(LED_BUILTIN, on ? HIGH : LOW);
+    IO_SetDebugLED(on);
 
     static const SOS_Message msg2 = {Evt_TickerLED, 0};
     SOS_StartTimer(Timer_Main250, 250, Process_Main, &msg2);
@@ -90,44 +96,48 @@ static state_t stateOperational(const SOS_Message *pMsg)
   case Evt_KeyLeft:
     if (pMsg->msg_Param1 == IO_INPUT_ACTIVE)
     {
-      set_pos = 15;
+      set_pos = SERVO_MAX_ANGLE;
       Serial.println("Setting " + String(set_pos));
-      // EEPROM.update(0x0000, set_pos);
+      EEPROM.update(0x0000, set_pos);
     }
     break;
 
   case Evt_KeyRight:
     if (pMsg->msg_Param1 == IO_INPUT_ACTIVE)
     {
-      set_pos = 180 - 15;
+      set_pos = 180 - SERVO_MAX_ANGLE;
       Serial.println("Setting " + String(set_pos));
-      // EEPROM.update(0x0000, set_pos);
+      EEPROM.update(0x0000, set_pos);
     }
     break;
 
   case Evt_TickerServo:
+  {
     // Serial.println(String(millis()));
     static const SOS_Message msg = {Evt_TickerServo, 0};
     SOS_StartTimer(Timer_Main50, 50, Process_Main, &msg);
 
+    auto old_pos = current_pos;
     if (current_pos < set_pos)
     {
       current_pos += SERVO_STEP_RUN;
-      digitalWrite(LED_BUILTIN, HIGH);
-      Serial.println("pos change to " + String(current_pos));
     }
     else if (current_pos > set_pos)
     {
       current_pos -= SERVO_STEP_RUN;
+    }
+
+    if (current_pos != old_pos)
+    {
+      setServoPos(current_pos);
       digitalWrite(LED_BUILTIN, HIGH);
       Serial.println("pos change to " + String(current_pos));
     }
     else
     {
-      digitalWrite(LED_BUILTIN, LOW);
+      IO_SetDebugLED(false);
     }
-    current_pos = constrain(current_pos, 15, 180 - 15);
-    myservo.write(current_pos);
+  }
 
   default:
     break;
@@ -145,9 +155,11 @@ void MAIN_Process(const SOS_Message *pMsg)
   case OPERATIONAL:
     new_state = stateOperational(pMsg);
     break;
+
   case TEACHIN:
     new_state = stateTeachin(pMsg);
     break;
+
   default:
     break;
   }
@@ -161,36 +173,28 @@ void MAIN_Process(const SOS_Message *pMsg)
 
 void MAIN_Init()
 {
-  uint8_t x = EEPROM.read(0x0000);
+  // Try to restore last position from EEPROM
+  const uint8_t x = EEPROM.read(0x0000);
   if (x != 0xFF)
   {
     Serial.println(String("Restoring ") + String(x));
-    set_pos = current_pos = x;
+    set_pos = x;
   }
 
   myservo.attach(10);
-  myservo.write(current_pos);
+  // myservo.write(current_pos);
+  setServoPos(set_pos);
 
   static const SOS_Message msg = {Evt_TickerServo, 0};
   SOS_StartTimer(Timer_Main50, 50, Process_Main, &msg);
 }
 
-/*
- * TODO:
- * - Teach in modes: left, right limit, done
- */
-
 void setup()
 {
-  pinMode(LED_BUILTIN, OUTPUT);
-
   Serial.begin(115200);
 
   TMR_Init(); // Start Timer system
   SOS_Init(); // Initialize Simple OS, also initializes sub systems
-
-  IO_Init();
-  MAIN_Init();
 }
 
 void loop()

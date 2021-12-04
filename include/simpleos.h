@@ -17,25 +17,27 @@
 /* Queue upto 16 messages */
 #define EVENT_QUEUE_SIZE (16)
 
+//--- types ------------------------------------------------------------------
+
 /* List of all processes */
-typedef enum _SOS_ProcessId
+enum SOS_ProcessId
 {
   Process_Undefined = 0,
   Process_Main,
   Process_MAX
-} SOS_ProcessId;
+};
 
 /* List of available timers */
-typedef enum _SOS_TimerId
+enum SOS_TimerId
 {
   Timer_Undefined = 0,
   Timer_Main50,
   Timer_Main250,
   Timer_MAX
-} SOS_TimerId;
+};
 
 /* SOS Events */
-typedef enum _SOS_Event
+enum SOS_Event
 {
   Evt_None,
   Evt_KeyMode,
@@ -44,13 +46,13 @@ typedef enum _SOS_Event
   Evt_TickerServo,
   Evt_TickerLED,
   Evt_MAX
-} SOS_Event;
+};
 
-typedef struct _SOS_Message
+struct SOS_Message
 {
   SOS_Event msg_Event; // Event code
   uint32_t msg_Param1; // Optional message parameter
-} SOS_Message;
+};
 
 //--- functions --------------------------------------------------------------
 

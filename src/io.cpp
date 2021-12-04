@@ -10,9 +10,14 @@
 //--- defines ----------------------------------------------------------------
 
 /* Defines bits in io_OutputState variable */
-#define PIN_KEY_LEFT_N 2
-#define PIN_KEY_RIGHT_N 3
-#define PIN_KEY_MODE_N 4
+#define PIN_DEBUG_LED (1 << 0)
+
+/* Input Pins */
+#define PIN_KEY_LEFT_N (2)
+#define PIN_KEY_RIGHT_N (3)
+#define PIN_KEY_MODE_N (4)
+
+//--- types ------------------------------------------------------------------
 
 /* Possible values for digital input */
 typedef enum _IO_DigInValue
@@ -27,7 +32,7 @@ typedef struct _IO_DigInState
   uint8_t di_ShiftReg;
   bool di_ChangeFlag;
   IO_DigInValue di_CurrValue;
-  unsigned int di_TimeActive;
+  unsigned di_TimeActive;
 } IO_DigInState;
 
 /* Digital inputs mapping table - Routes inputs messages to processes */
@@ -35,15 +40,15 @@ typedef struct _IO_EventMap
 {
   SOS_ProcessId em_ProcessId;
   SOS_Event em_Event;
-  unsigned int em_AutoRepeatInMs;
-  unsigned int em_ParamLow;
-  unsigned int em_ParamHigh;
+  unsigned em_AutoRepeatInMs;
+  unsigned em_ParamLow;
+  unsigned em_ParamHigh;
 } IO_EventMap;
 
 //--- variables --------------------------------------------------------------
 
 /* Shadow register for digital outputs */
-// static UInt16         io_OutputState    = 0;
+static uint16_t io_OutputState = 0;
 
 /* Digital input states */
 static IO_DigInState io_InputState[IO_Inputs_Max];
@@ -59,7 +64,7 @@ static const IO_EventMap io_InputMsgMap[IO_Inputs_Max] =
 
 //--- local functions --------------------------------------------------------
 
-inline static void scanInputPin(unsigned int index, bool currState)
+inline static void scanInputPin(unsigned index, bool currState)
 {
   IO_DigInState *pState = &io_InputState[index];
   const IO_EventMap *pEvent = &io_InputMsgMap[index];
@@ -129,10 +134,9 @@ static void reportChanges(void)
 {
   const IO_EventMap *pEvent = io_InputMsgMap;
   IO_DigInState *pState = io_InputState;
-  unsigned int i;
 
   /* For each input that changed state send message to listener process */
-  for (i = 0; i < IO_Inputs_Max; i++)
+  for (auto i = 0; i < IO_Inputs_Max; i++)
   {
     if ((pState->di_ChangeFlag) && (pEvent->em_ProcessId != Process_Undefined))
     {
@@ -144,14 +148,15 @@ static void reportChanges(void)
       case IO_IN_LOW:
         msg.msg_Param1 = pEvent->em_ParamLow;
         break;
+
       case IO_IN_HIGH:
         msg.msg_Param1 = pEvent->em_ParamHigh;
         break;
+
       default:
         break;
       }
 
-      Serial.println("state changed");
       // D(("Input state change: %s = %d\n",
       //   inputToString(i), pState->di_CurrValue));
       SOS_PostEvent(pEvent->em_ProcessId, &msg);
@@ -168,59 +173,36 @@ static void reportChanges(void)
 
 static void updateOutputs(void)
 {
-  //   UInt16 portB;
-
-  //   portB = PORTB;
-  //   portB &= ~( (1<<6) | (1<<7) | (1<<12) | (1<<13) | (1<<14) | (1<<15) );
-
-  //   if ( (io_OutputState & PIN_ENIO_N) == 0 ) {
-  //     portB |= 1<<13;
-  //   }
-  //   if ( (io_OutputState & PIN_ENLPIO_N) == 0 ) {
-  //     portB |= 1<<15;
-  //   }
-  //   if ( (io_OutputState & PIN_ENLPCORE_N) == 0 ) {
-  //     portB |= 1<<14;
-  //   }
-  //   if ( (io_OutputState & PIN_PWRRESET_N) == 0 ) {
-  //     portB |= 1<<7;
-  //   }
-  //   if ( (io_OutputState & PIN_PMWPWROK) == PIN_PMWPWROK ) {
-  //     portB |= 1<<12;
-  //   }
-  //   if ( (io_OutputState & PIN_DEBUG_LED_N) == 0 ) {
-  //     portB |= 1<<6;
-  //   }
-  //   PORTB = portB;
+  digitalWrite(LED_BUILTIN, ((io_OutputState & PIN_DEBUG_LED) != 0) ? HIGH : LOW);
 }
 
 //----------------------------------------------------------------------------
 
-// inline static void modifyState( UInt16 bitMask, Bool state )
-// {
-//   if (state) {
-//     io_OutputState |=  bitMask;
-//   }
-//   else {
-//     io_OutputState &= ~bitMask;
-//   }
-//   updateOutputs();
-// }
+inline static void modifyState(uint16_t bitMask, bool state)
+{
+  if (state)
+  {
+    io_OutputState |= bitMask;
+  }
+  else
+  {
+    io_OutputState &= ~bitMask;
+  }
+  updateOutputs();
+}
 
 //----------------------------------------------------------------------------
 
 static void configureOutputs(void)
 {
-  // /*
-  //  * Set default values. Note that these are the logical signal states.
-  //  * Inversion for active low outputs takes place in updateOutputs()
-  //  *  - All supplies are initially off
-  //  *  - Power Reset is activated
-  //  *  - PMC Power Ok indication is off
-  //  *  - LED is off
-  //  */
-  // io_OutputState    = PIN_PWRRESET_N;
-  // updateOutputs();
+  /*
+   * Set default values. Note that these are the logical signal states.
+   * Inversion for active low outputs takes place in updateOutputs()
+   */
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  io_OutputState = 0x0000;
+  updateOutputs();
 }
 
 //----------------------------------------------------------------------------
@@ -234,51 +216,15 @@ static void configureInputs(void)
 
 //--- global functions ------------------------------------------------------
 
-// void IO_SetEnIO( Bool state )
-// {
-//   modifyState( PIN_ENIO_N, state );
-// }
-
-// //----------------------------------------------------------------------------
-
-// void IO_SetEnLpIo( Bool state )
-// {
-//   modifyState( PIN_ENLPIO_N, state );
-// }
-
-// //----------------------------------------------------------------------------
-
-// void IO_SetEnLpCore( Bool state )
-// {
-//   modifyState( PIN_ENLPCORE_N, state );
-// }
-
-// //----------------------------------------------------------------------------
-
-// void IO_SetPwrReset( Bool state )
-// {
-//   modifyState( PIN_PWRRESET_N, state );
-// }
-
-// //----------------------------------------------------------------------------
-
-// void IO_SetPmcPwrOk( Bool state )
-// {
-//   modifyState( PIN_PMWPWROK, state );
-// }
-// //----------------------------------------------------------------------------
-
-// void IO_SetDebugLED( Bool state )
-// {
-//   modifyState( PIN_DEBUG_LED_N, state );
-// }
+void IO_SetDebugLED(bool state)
+{
+  modifyState(PIN_DEBUG_LED, state);
+}
 
 //----------------------------------------------------------------------------
 
 void IO_ForceStateUpdate(IO_Inputs input)
 {
-  // DBG_ASSERT( input < IO_Inputs_Max );
-
   // D(("Requesting status report of input %s\n",
   //   inputToString( input ) ));
   io_InputState[input].di_ChangeFlag = true;
@@ -312,14 +258,13 @@ void IO_Run(void)
 void IO_Init(void)
 {
   IO_DigInState *pState = io_InputState;
-  unsigned int i;
 
   /* Initialize PIC hardware */
   configureInputs();
   configureOutputs();
 
   /* Initialize Input state registers (assume input is low) */
-  for (i = 0; i < IO_Inputs_Max; i++)
+  for (auto i = 0; i < IO_Inputs_Max; i++)
   {
     pState->di_ShiftReg = 0x00;
     pState->di_ChangeFlag = false;
@@ -330,14 +275,14 @@ void IO_Init(void)
   }
 
   /* Load current pin values to get initial state */
-  for (i = 0; i < 3; i++)
+  for (auto i = 0; i < 3; i++)
   {
     scanAllInputs();
   }
 
   /* Clear the changed flag to suppress initial state change reports */
   pState = io_InputState;
-  for (i = 0; i < IO_Inputs_Max; i++)
+  for (auto i = 0; i < IO_Inputs_Max; i++)
   {
     pState->di_ChangeFlag = false;
     pState++;

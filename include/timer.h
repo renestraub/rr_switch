@@ -3,14 +3,14 @@
 
 /** 
  * @file
- * Timer System based on PIC24 Timer 1.
+ * Timer System based on Arduino millisecond timer.
  */
 
 //--- includes ---------------------------------------------------------------
 
 #include <stdint.h>
 
-//--- defines ----------------------------------------------------------------
+//--- types ------------------------------------------------------------------
 
 /**
  * Timer Interval.
@@ -60,29 +60,6 @@ TMR_Interval TMR_StartInterval(uint32_t milliSecs);
  * @see TMR_StartInterval()
  **/
 bool TMR_HasIntervalElapsed(TMR_Interval interval);
-
-// /**
-//  * Delay for specified Milliseconds.
-//  *
-//  * @param  milliSecs  IN  Number of milliseconds to wait.
-//  **/
-// void TMR_DelayMs( uint32_t milliSecs );
-
-// /**
-//  * Converts time in Milliseconds into system ticks.
-//  *
-//  * @param  milliSecs  IN  Number of milliseconds.
-//  * @return Number of system ticks.
-//  **/
-// UInt32 TMR_MilliSecsToTicks( uint32_t milliSecs );
-
-// /**
-//  * Converts time in Microseconds into internal representation for TMR_DelayUs().
-//  *
-//  * @param  microSecs  IN  Number of microseconds to wait.
-//  * @return jiffies for call to TMR_DelayUs().
-//  **/
-// UInt32 TMR_MicroSecsToJiffies( uint32_t microSecs );
 
 /**
  * Initializes Timer Module. 

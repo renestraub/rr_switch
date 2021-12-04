@@ -2,17 +2,15 @@
 //--- includes ---------------------------------------------------------------
 
 #include <stdint.h>
-#include <stdbool.h>
 
-// #include "debug.h"          // DBG_ASSERT()
 #include "timer.h" // Timer system
 #include "io.h"
+#include "main.h"
 
 #include "simpleos.h" // Own header file
 
-extern void MAIN_Process(const SOS_Message *pMsg); // Main process
 
-//--- defines ----------------------------------------------------------------
+//--- types ------------------------------------------------------------------
 
 /* Timer structure */
 typedef struct _SOS_Timer
@@ -33,9 +31,9 @@ typedef struct _SOS_QueueEntry
 /* Event queue. Essentially a ring buffer with message entries */
 typedef struct _SOS_EventQueue
 {
-  unsigned int evq_WriteIndex;
-  unsigned int evq_ReadIndex;
-  unsigned int evq_NumEntries;
+  unsigned evq_WriteIndex;
+  unsigned evq_ReadIndex;
+  unsigned evq_NumEntries;
   SOS_QueueEntry evq_Messages[EVENT_QUEUE_SIZE];
 } SOS_EventQueue;
 
@@ -46,8 +44,6 @@ static SOS_EventQueue sos_Events;
 
 // Timers
 static SOS_Timer sos_Timers[Timer_MAX];
-
-static int sos_TickPhase = 0;
 
 //--- local functions --------------------------------------------------------
 
@@ -78,38 +74,11 @@ static SOS_QueueEntry *sos_GetEvent(void)
 
 //----------------------------------------------------------------------------
 
-#ifdef _DEBUG
-
-static const char *sos_GetProcessName(SOS_ProcessId id)
-{
-  switch (id)
-  {
-  case Process_Undefined:
-    return "<Undefined>";
-  case Process_Watchdog:
-    return "Watchdog";
-  case Process_ExtReset:
-    return "ExtReset";
-  case Process_Supervisor:
-    return "Supervisor";
-  case Process_LED:
-    return "LED";
-  default:
-    DBG_ASSERT(False);
-    return "<unknown>";
-  }
-}
-
-#endif
-
-//----------------------------------------------------------------------------
-
 static void sos_TimersInit(void)
 {
   SOS_Timer *pTimer = sos_Timers;
-  unsigned int i;
 
-  for (i = 0; i < Timer_MAX; i++)
+  for (auto i = 0; i < Timer_MAX; i++)
   {
     pTimer->tmr_Active = false;
     pTimer++;
@@ -121,9 +90,8 @@ static void sos_TimersInit(void)
 static void sos_TimersProcess(void)
 {
   SOS_Timer *pTimer = sos_Timers;
-  unsigned int i;
 
-  for (i = 0; i < Timer_MAX; i++)
+  for (auto i = 0; i < Timer_MAX; i++)
   {
     if (pTimer->tmr_Active)
     {
@@ -147,10 +115,6 @@ void SOS_StartTimer(SOS_TimerId timerId, uint32_t milliSecs, SOS_ProcessId proce
 {
   SOS_Timer *pTimer = &sos_Timers[timerId];
 
-  // DBG_ASSERT( timerId < Timer_MAX );
-  // DBG_ASSERT( milliSecs < 1000000UL );
-  // DBG_ASSERT( (processId > Process_Undefined) && (processId < Process_MAX) );
-
   pTimer->tmr_Time = TMR_StartInterval(milliSecs);
   pTimer->tmr_Process = processId;
   pTimer->tmr_Msg = *pMsg;
@@ -166,8 +130,6 @@ void SOS_StopTimer(SOS_TimerId timerId)
 {
   SOS_Timer *pTimer = &sos_Timers[timerId];
 
-  // DBG_ASSERT( timerId < Timer_MAX );
-
   pTimer->tmr_Active = false;
   // D(( "Timer %d stopped\n", timerId ));
 }
@@ -176,8 +138,6 @@ void SOS_StopTimer(SOS_TimerId timerId)
 
 void SOS_PostEvent(SOS_ProcessId processId, const SOS_Message *pMsg)
 {
-  // DBG_ASSERT( (processId > Process_Undefined) && (processId < Process_MAX) );
-
   /* Place message in event queue */
   if (sos_Events.evq_NumEntries < EVENT_QUEUE_SIZE)
   {
@@ -205,23 +165,10 @@ void SOS_TimerTick(void)
 {
   /* Call processes's Tick function */
 
-  // PWR_Tick();           // Call every 500uS so that each voltage is checked
-  //                       // once every 1mS.
+  /* Process OS timers once each millisecond, fire events if elapsed */
+  sos_TimersProcess();
 
-  if (sos_TickPhase == 0)
-  {
-    /* Process OS timers once each millisecond, fire events if elapsed */
-    sos_TimersProcess();
-
-    sos_TickPhase = 1;
-  }
-  else
-  {
-    /* Handle digital IOs once per millisecond */
-    IO_Tick();
-
-    sos_TickPhase = 0;
-  }
+  IO_Tick();
 }
 
 //----------------------------------------------------------------------------
@@ -252,7 +199,6 @@ void SOS_Schedule(void)
 
     default:
       // D(("Unknown process %d\n", pEntry->qe_ProcessId));
-      // DBG_ASSERT(False);
       break;
     }
 
@@ -270,7 +216,8 @@ void SOS_Init(void)
 
   // Initialize all known processes
 
-  // IO_Init();
+  IO_Init();
+  MAIN_Init();
 }
 
 //--- eof --------------------------------------------------------------------
