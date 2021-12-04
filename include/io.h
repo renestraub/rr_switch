@@ -10,13 +10,11 @@
 
 #include <stdint.h>
 
-
-
 //--- defines ----------------------------------------------------------------
 
 // Events sent on input change
-#define IO_INPUT_ACTIVE     (0)
-#define IO_INPUT_INACTIVE   (1)
+#define IO_INPUT_ACTIVE (0)
+#define IO_INPUT_INACTIVE (1)
 
 /**
  * Digital Inputs
@@ -28,10 +26,7 @@ typedef enum _IO_Inputs
   IO_KEY_MODE_N,
 
   IO_Inputs_Max
-}
-IO_Inputs;
-
-
+} IO_Inputs;
 
 //--- functions --------------------------------------------------------------
 
@@ -59,32 +54,29 @@ IO_Inputs;
  *
  * @param  voltage  IN  Input to check.
  **/
-void IO_ForceStateUpdate( IO_Inputs input );
-
+void IO_ForceStateUpdate(IO_Inputs input);
 
 /**
  * Tick function for process.
  *
  * This function synchronously at the OS tick rate.
  **/
-void IO_Tick( void );
+void IO_Tick(void);
 
 /**
  * Run function for process.
  *
  * This function is called asynchronously whenever the scheduler runs.
  **/
-void IO_Run( void );
+void IO_Run(void);
 
 /**
  * Initializes Input/Output module.
  *
  * Must be called before any other function of this module can be used.
  **/
-void IO_Init( void );
-
+void IO_Init(void);
 
 #endif /* _IO_H */
 
 //--- eof --------------------------------------------------------------------
-

@@ -10,8 +10,6 @@
 
 #include <stdint.h>
 
-
-
 //--- defines ----------------------------------------------------------------
 
 /**
@@ -20,9 +18,7 @@
  * This structure is returned by a call to TMR_StartInterval() and later used
  * in calls to TMR_HasIntervalElapsed().
  */
-typedef uint32_t    TMR_Interval;
-
-
+typedef uint32_t TMR_Interval;
 
 //--- functions --------------------------------------------------------------
 
@@ -32,14 +28,14 @@ typedef uint32_t    TMR_Interval;
  * @return True if a timer tick occured since the last call. False
  *         otherwise.
  **/
-bool TMR_HasTickElapsed( void );
+bool TMR_HasTickElapsed(void);
 
 /**
  * Returns current system time in milliseconds.
  *
  * @return Current time in milliseconds.
  **/
-uint32_t TMR_GetMilliseconds( void );
+uint32_t TMR_GetMilliseconds(void);
 
 /**
  * Define a timer interval.
@@ -53,7 +49,7 @@ uint32_t TMR_GetMilliseconds( void );
  * @return  Timer Interval object.
  * @see TMR_HasIntervalElapsed()
  **/
-TMR_Interval TMR_StartInterval( uint32_t milliSecs );
+TMR_Interval TMR_StartInterval(uint32_t milliSecs);
 
 /**
  * Checks whether an interval is elapsed.
@@ -63,7 +59,7 @@ TMR_Interval TMR_StartInterval( uint32_t milliSecs );
  * @return True if interval has elapsed, False otherwise.
  * @see TMR_StartInterval()
  **/
-bool TMR_HasIntervalElapsed( TMR_Interval interval );
+bool TMR_HasIntervalElapsed(TMR_Interval interval);
 
 // /**
 //  * Delay for specified Milliseconds.
@@ -80,7 +76,6 @@ bool TMR_HasIntervalElapsed( TMR_Interval interval );
 //  **/
 // UInt32 TMR_MilliSecsToTicks( uint32_t milliSecs );
 
-
 // /**
 //  * Converts time in Microseconds into internal representation for TMR_DelayUs().
 //  *
@@ -95,8 +90,6 @@ bool TMR_HasIntervalElapsed( TMR_Interval interval );
  **/
 void TMR_Init();
 
-
 #endif /* _TIMER_H */
 
 //--- eof --------------------------------------------------------------------
-

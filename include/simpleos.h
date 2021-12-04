@@ -12,13 +12,10 @@
 
 #include "timer.h"
 
-
-
 //--- defines ----------------------------------------------------------------
 
 /* Queue upto 16 messages */
-#define EVENT_QUEUE_SIZE    (16)
-
+#define EVENT_QUEUE_SIZE (16)
 
 /* List of all processes */
 typedef enum _SOS_ProcessId
@@ -26,9 +23,7 @@ typedef enum _SOS_ProcessId
   Process_Undefined = 0,
   Process_Main,
   Process_MAX
-}
-SOS_ProcessId;
-
+} SOS_ProcessId;
 
 /* List of available timers */
 typedef enum _SOS_TimerId
@@ -37,9 +32,7 @@ typedef enum _SOS_TimerId
   Timer_Main50,
   Timer_Main250,
   Timer_MAX
-}
-SOS_TimerId;
-
+} SOS_TimerId;
 
 /* SOS Events */
 typedef enum _SOS_Event
@@ -51,18 +44,13 @@ typedef enum _SOS_Event
   Evt_TickerServo,
   Evt_TickerLED,
   Evt_MAX
-}
-SOS_Event;
-
+} SOS_Event;
 
 typedef struct _SOS_Message
 {
-  SOS_Event       msg_Event;        // Event code
-  uint32_t        msg_Param1;       // Optional message parameter
-}
-SOS_Message;
-
-
+  SOS_Event msg_Event; // Event code
+  uint32_t msg_Param1; // Optional message parameter
+} SOS_Message;
 
 //--- functions --------------------------------------------------------------
 
@@ -79,7 +67,7 @@ SOS_Message;
  *                        message paramters.
  * @see SOS_StopTimer
  */
-void SOS_StartTimer( SOS_TimerId timerId, uint32_t milliSecs, SOS_ProcessId processId, const SOS_Message* pMsg );
+void SOS_StartTimer(SOS_TimerId timerId, uint32_t milliSecs, SOS_ProcessId processId, const SOS_Message *pMsg);
 
 /**
  * Stops a timer.
@@ -92,7 +80,7 @@ void SOS_StartTimer( SOS_TimerId timerId, uint32_t milliSecs, SOS_ProcessId proc
  *  timer has been stopped a message can arrive.
  * @see SOS_StartTimer
  */
-void SOS_StopTimer( SOS_TimerId timerId );
+void SOS_StopTimer(SOS_TimerId timerId);
 
 /**
  * Posts an event to a process.
@@ -107,26 +95,26 @@ void SOS_StopTimer( SOS_TimerId timerId );
  *                        call and can thus be released when the function
  *                        returns.
  **/
-void SOS_PostEvent( SOS_ProcessId processId, const SOS_Message* pMsg );
+void SOS_PostEvent(SOS_ProcessId processId, const SOS_Message *pMsg);
 
 /**
  * OS Timer Tick.
  * Call this function on each timer tick. The OS processes its timers
  * in this function and calls the tick() function of all processes.
  **/
-void SOS_TimerTick( void );
+void SOS_TimerTick(void);
 
 /**
  * OS Schedule Function.
  * Call this function to process messages and call the run() function
  * of all processes.
  **/
-void SOS_Schedule( void );
+void SOS_Schedule(void);
 
 /**
  * Initializes Simple OS.
  **/
-void SOS_Init( void );
+void SOS_Init(void);
 
 #endif /* _SIMPLE_OS_H */
 

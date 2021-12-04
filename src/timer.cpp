@@ -1,20 +1,14 @@
 
 //--- includes ---------------------------------------------------------------
 
-#include <Arduino.h>        // millis()
+#include <Arduino.h> // millis()
 
 // #include "debug.h"          // DBG_ASSERT()
-#include "timer.h"          // Own header file
-
-
+#include "timer.h" // Own header file
 
 //--- defines ----------------------------------------------------------------
 
-
-
 //--- variables --------------------------------------------------------------
-
-// static bool             tmr_Initialized     = false;    // True if timer system is ready
 
 // static uint32_t           tmr_TickRate        = 0;        // Desired timer tick (i.e 100Hz)
 
@@ -33,19 +27,15 @@
 
 static uint32_t time_ms = 0;
 
-
-
 //--- local functions --------------------------------------------------------
-
-
 
 //--- global functions ------------------------------------------------------
 
-bool TMR_HasTickElapsed( void )
+bool TMR_HasTickElapsed(void)
 {
   uint32_t now = millis();
 
-  if ( now > time_ms )
+  if (now > time_ms)
   {
     time_ms = now;
     return true;
@@ -63,7 +53,7 @@ bool TMR_HasTickElapsed( void )
 
 //----------------------------------------------------------------------------
 
-uint32_t TMR_GetMilliseconds( void )
+uint32_t TMR_GetMilliseconds(void)
 {
   uint32_t now = millis();
   return now;
@@ -71,34 +61,34 @@ uint32_t TMR_GetMilliseconds( void )
 
 //----------------------------------------------------------------------------
 
-TMR_Interval TMR_StartInterval( uint32_t milliSecs )
+TMR_Interval TMR_StartInterval(uint32_t milliSecs)
 {
-  TMR_Interval  iv;
+  TMR_Interval iv;
   // uint32_t        ticks;
-  uint32_t        now;
+  uint32_t now;
 
   // DBG_ASSERT( tmr_Initialized );
   // DBG_ASSERT( milliSecs < (1000UL*3600UL) );
 
-  now     = TMR_GetMilliseconds();
-  iv      = now + milliSecs + 1;    // +1 to ensure minimal delay of 1 tick
+  now = TMR_GetMilliseconds();
+  iv = now + milliSecs + 1; // +1 to ensure minimal delay of 1 tick
 
   return iv;
 }
 
 //----------------------------------------------------------------------------
 
-bool TMR_HasIntervalElapsed( TMR_Interval interval )
+bool TMR_HasIntervalElapsed(TMR_Interval interval)
 {
-  uint32_t  delta;
-  uint32_t  now;
+  uint32_t delta;
+  uint32_t now;
 
   // DBG_ASSERT( tmr_Initialized );
 
-  now     = TMR_GetMilliseconds();
-  delta   = now - interval;
+  now = TMR_GetMilliseconds();
+  delta = now - interval;
 
-  return ( delta < 0x80000000UL );
+  return (delta < 0x80000000UL);
 }
 
 //----------------------------------------------------------------------------
