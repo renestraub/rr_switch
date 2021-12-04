@@ -5,7 +5,7 @@
 
 #include "timer.h" // Timer system
 #include "io.h"
-#include "main.h"
+#include "app.h"
 
 #include "simpleos.h" // Own header file
 
@@ -194,7 +194,7 @@ void SOS_Schedule(void)
     switch (pEntry->qe_ProcessId)
     {
     case Process_Main:
-      MAIN_Process(&pEntry->qe_Message);
+      APP_Process(&pEntry->qe_Message);
       break;
 
     default:
@@ -216,8 +216,9 @@ void SOS_Init(void)
 
   // Initialize all known processes
 
+  TMR_Init(); // Start Timer system
   IO_Init();
-  MAIN_Init();
+  APP_Init();
 }
 
 //--- eof --------------------------------------------------------------------

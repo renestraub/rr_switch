@@ -1,5 +1,5 @@
-#ifndef _MAIN_H
-#define _MAIN_H
+#ifndef _APP_H
+#define _APP_H
 
 //--- includes ---------------------------------------------------------------
 
@@ -14,15 +14,15 @@
  * 
  * @param pMsg Message to process (event, parameter)
  */
-void MAIN_Process(const SOS_Message *pMsg);
+void APP_Process(const SOS_Message *pMsg);
 
 /**
- * Initializes Input/Output module.
+ * Initializes Application module.
  *
  * Must be called before any other function of this module can be used.
  **/
-void MAIN_Init(void);
+void APP_Init(void);
 
-#endif /* _MAIN_H */
+#endif /* _APP_H */
 
 //--- eof --------------------------------------------------------------------
