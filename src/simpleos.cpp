@@ -181,11 +181,10 @@ void SOS_PostEventArgs(SOS_ProcessId processId, SOS_Event event, uint32_t param)
 void SOS_TimerTick(void)
 {
   /* Call processes's Tick function */
+  IO_Tick();
 
   /* Process OS timers once each millisecond, fire events if elapsed */
   sos_TimersProcess();
-
-  IO_Tick();
 }
 
 //----------------------------------------------------------------------------
