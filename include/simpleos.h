@@ -40,6 +40,7 @@ enum SOS_TimerId
 enum SOS_Event
 {
   Evt_None,
+  Evt_Enter,
   Evt_KeyMode,
   Evt_KeyLeft,
   Evt_KeyRight,
@@ -98,6 +99,8 @@ void SOS_StopTimer(SOS_TimerId timerId);
  *                        returns.
  **/
 void SOS_PostEvent(SOS_ProcessId processId, const SOS_Message *pMsg);
+
+void SOS_PostEventArgs(SOS_ProcessId processId, SOS_Event event, uint32_t param);
 
 /**
  * OS Timer Tick.

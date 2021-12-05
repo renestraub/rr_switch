@@ -40,6 +40,16 @@ static void setServoPos(int pos)
 
 //----------------------------------------------------------------------------
 
+static void teachinEnter()
+{
+  // Serial.println("teachinEnter");
+
+  setServoPos(90);
+
+  static const SOS_Message msg1 = {Evt_TickerLED, 0};
+  SOS_StartTimer(Timer_Main250, 250, Process_Main, &msg1);
+}
+
 static state_t stateTeachin(const SOS_Message *pMsg)
 {
   static bool on = false;
@@ -47,13 +57,14 @@ static state_t stateTeachin(const SOS_Message *pMsg)
 
   switch (pMsg->msg_Event)
   {
+  case Evt_Enter:
+    teachinEnter();
+    break;
+
   case Evt_KeyMode:
     if (pMsg->msg_Param1 == IO_INPUT_ACTIVE)
     {
       new_state = OPERATIONAL;
-
-      static const SOS_Message msg1 = {Evt_TickerServo, 0};
-      SOS_StartTimer(Timer_Main50, 50, Process_Main, &msg1);
     }
     break;
 
@@ -82,17 +93,27 @@ static state_t stateTeachin(const SOS_Message *pMsg)
 
 //----------------------------------------------------------------------------
 
+static void operationalEnter()
+{
+  // Serial.println("operationalEnter");
+
+  static const SOS_Message msg1 = {Evt_TickerServo, 0};
+  SOS_StartTimer(Timer_Main50, 50, Process_Main, &msg1);
+}
+
 static state_t stateOperational(const SOS_Message *pMsg)
 {
   state_t new_state = state;
 
   switch (pMsg->msg_Event)
   {
+  case Evt_Enter:
+    operationalEnter();
+    break;
+
   case Evt_KeyMode:
     if (pMsg->msg_Param1 == IO_INPUT_ACTIVE)
     {
-      static const SOS_Message msg1 = {Evt_TickerLED, 0};
-      SOS_StartTimer(Timer_Main250, 250, Process_Main, &msg1);
       new_state = TEACHIN;
     }
     break;
@@ -117,7 +138,6 @@ static state_t stateOperational(const SOS_Message *pMsg)
 
   case Evt_TickerServo:
   {
-    // Serial.println(String(millis()));
     static const SOS_Message msg = {Evt_TickerServo, 0};
     SOS_StartTimer(Timer_Main50, 50, Process_Main, &msg);
 
@@ -174,6 +194,9 @@ void APP_Process(const SOS_Message *pMsg)
   {
     state = new_state;
     Serial.println("New state" + String(state));
+
+    // Post Enter message for new state
+    SOS_PostEventArgs(Process_Main, Evt_Enter, 0);
   }
 }
 
@@ -192,8 +215,8 @@ void APP_Init()
   myservo.attach(10);
   setServoPos(set_pos);
 
-  static const SOS_Message msg = {Evt_TickerServo, 0};
-  SOS_StartTimer(Timer_Main50, 50, Process_Main, &msg);
+  // Start state machine
+  SOS_PostEventArgs(Process_Main, Evt_Enter, 0);
 }
 
 //--- eof --------------------------------------------------------------------

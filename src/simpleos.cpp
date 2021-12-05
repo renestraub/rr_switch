@@ -161,6 +161,14 @@ void SOS_PostEvent(SOS_ProcessId processId, const SOS_Message *pMsg)
 
 //----------------------------------------------------------------------------
 
+void SOS_PostEventArgs(SOS_ProcessId processId, SOS_Event event, uint32_t param)
+{
+  const SOS_Message msg = {event, param};
+  SOS_PostEvent(processId, &msg);
+}
+
+//----------------------------------------------------------------------------
+
 void SOS_TimerTick(void)
 {
   /* Call processes's Tick function */
