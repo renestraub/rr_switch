@@ -134,7 +134,7 @@ static state_t stateOperational(const SOS_Message *pMsg)
     if (current_pos != old_pos)
     {
       setServoPos(current_pos);
-      digitalWrite(LED_BUILTIN, HIGH);
+      IO_SetDebugLED(true);
       Serial.println("pos change to " + String(current_pos));
     }
     else
