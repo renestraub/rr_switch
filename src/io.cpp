@@ -159,7 +159,7 @@ static void reportChanges(void)
 
       // D(("Input state change: %s = %d\n",
       //   inputToString(i), pState->di_CurrValue));
-      SOS_PostEvent(pEvent->em_ProcessId, &msg);
+      SOS_PostEvent(pEvent->em_ProcessId, msg);
 
       pState->di_ChangeFlag = false;
     }

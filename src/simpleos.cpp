@@ -99,7 +99,7 @@ static void sos_TimersProcess(void)
         // D(( "Timer %d elapsed at %ld\n", i,
         //   TMR_GetMilliseconds() ));
 
-        SOS_PostEvent(pTimer->tmr_Process, &pTimer->tmr_Msg);
+        SOS_PostEvent(pTimer->tmr_Process, pTimer->tmr_Msg);
 
         pTimer->tmr_Active = false;
       }
@@ -110,13 +110,13 @@ static void sos_TimersProcess(void)
 
 //--- global functions ------------------------------------------------------
 
-void SOS_StartTimer(SOS_TimerId timerId, uint32_t milliSecs, SOS_ProcessId processId, const SOS_Message *pMsg)
+void SOS_StartTimer(SOS_TimerId timerId, uint32_t milliSecs, SOS_ProcessId processId, const SOS_Message &msg)
 {
   SOS_Timer *pTimer = &sos_Timers[timerId];
 
   pTimer->tmr_Time = TMR_StartInterval(milliSecs);
   pTimer->tmr_Process = processId;
-  pTimer->tmr_Msg = *pMsg;
+  pTimer->tmr_Msg = msg;
   pTimer->tmr_Active = true;
 
   // D(( "Timer %d started at %ld, timeout %ld millisecs\n",
@@ -145,13 +145,13 @@ void SOS_StopTimer(SOS_TimerId timerId)
 
 //----------------------------------------------------------------------------
 
-void SOS_PostEvent(SOS_ProcessId processId, const SOS_Message *pMsg)
+void SOS_PostEvent(SOS_ProcessId processId, const SOS_Message &msg)
 {
   /* Place message in event queue */
   if (sos_Events.evq_NumEntries < EVENT_QUEUE_SIZE)
   {
     sos_Events.evq_Messages[sos_Events.evq_WriteIndex].qe_ProcessId = processId;
-    sos_Events.evq_Messages[sos_Events.evq_WriteIndex].qe_Message = *pMsg;
+    sos_Events.evq_Messages[sos_Events.evq_WriteIndex].qe_Message = msg;
 
     if (++sos_Events.evq_WriteIndex >= EVENT_QUEUE_SIZE)
     {
@@ -173,7 +173,7 @@ void SOS_PostEvent(SOS_ProcessId processId, const SOS_Message *pMsg)
 void SOS_PostEventArgs(SOS_ProcessId processId, SOS_Event event, uint32_t param)
 {
   const SOS_Message msg = {event, param};
-  SOS_PostEvent(processId, &msg);
+  SOS_PostEvent(processId, msg);
 }
 
 //----------------------------------------------------------------------------

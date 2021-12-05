@@ -66,11 +66,11 @@ struct SOS_Message
  * @param  timerId    IN  Id of timer.
  * @param  milliSecs  IN  Number of milliseconds for timer to run.
  * @param  processId  IN  Id of process to receive message.
- * @param  pMsg       IN  Pointer to message consisting of event and
+ * @param  msg        IN  Reference to message consisting of event and
  *                        message paramters.
  * @see SOS_StopTimer
  */
-void SOS_StartTimer(SOS_TimerId timerId, uint32_t milliSecs, SOS_ProcessId processId, const SOS_Message *pMsg);
+void SOS_StartTimer(SOS_TimerId timerId, uint32_t milliSecs, SOS_ProcessId processId, const SOS_Message &msg);
 
 void SOS_RestartTimer(SOS_TimerId timerId, uint32_t milliSecs);
 
@@ -95,12 +95,12 @@ void SOS_StopTimer(SOS_TimerId timerId);
  * when the scheduler runs the next time.
  *
  * @param  processId  IN  Id of process to receive message.
- * @param  pMsg       IN  Pointer to message consisting of event and
+ * @param  msg        IN  Reference to message consisting of event and
  *                        message paramters. The message is copied in this
  *                        call and can thus be released when the function
  *                        returns.
  **/
-void SOS_PostEvent(SOS_ProcessId processId, const SOS_Message *pMsg);
+void SOS_PostEvent(SOS_ProcessId processId, const SOS_Message &msg);
 
 void SOS_PostEventArgs(SOS_ProcessId processId, SOS_Event event, uint32_t param);
 

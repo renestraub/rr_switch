@@ -46,8 +46,8 @@ static void teachinEnter()
 
   setServoPos(90);
 
-  static const SOS_Message msg1 = {Evt_TickerLED, 0};
-  SOS_StartTimer(Timer_Main250, 250, Process_Main, &msg1);
+  static const SOS_Message msg = {Evt_TickerLED, 0};
+  SOS_StartTimer(Timer_Main250, 250, Process_Main, msg);
 }
 
 static state_t stateTeachin(const SOS_Message *pMsg)
@@ -95,8 +95,8 @@ static void operationalEnter()
 {
   // Serial.println("operationalEnter");
 
-  static const SOS_Message msg1 = {Evt_TickerServo, 0};
-  SOS_StartTimer(Timer_Main50, 50, Process_Main, &msg1);
+  static const SOS_Message msg = {Evt_TickerServo, 0};
+  SOS_StartTimer(Timer_Main50, 50, Process_Main, msg);
 }
 
 static state_t stateOperational(const SOS_Message *pMsg)
@@ -190,7 +190,7 @@ void APP_Process(const SOS_Message *pMsg)
   if (new_state != state)
   {
     state = new_state;
-    Serial.println("New state" + String(state));
+    Serial.println("New state " + String(state));
 
     // Post Enter message for new state
     SOS_PostEventArgs(Process_Main, Evt_Enter, 0);
