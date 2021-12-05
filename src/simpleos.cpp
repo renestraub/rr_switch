@@ -9,7 +9,6 @@
 
 #include "simpleos.h" // Own header file
 
-
 //--- types ------------------------------------------------------------------
 
 /* Timer structure */

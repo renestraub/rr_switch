@@ -208,7 +208,7 @@ void APP_Init()
   const uint8_t x = EEPROM.read(0x0000);
   if (x != 0xFF)
   {
-    Serial.println(String("Restoring position") + String(x));
+    Serial.println(String("Restoring position ") + String(x));
     set_pos = x;
   }
 
