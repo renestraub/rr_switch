@@ -69,11 +69,11 @@ static state_t stateTeachin(const SOS_Message *pMsg)
     break;
 
   case Evt_KeyLeft:
-    setServoPos(current_pos + SERVO_STEP);
+    setServoPos(current_pos - SERVO_STEP);
     break;
 
   case Evt_KeyRight:
-    setServoPos(current_pos - SERVO_STEP);
+    setServoPos(current_pos + SERVO_STEP);
     break;
 
   case Evt_TickerLED: // Toggle LED to indicate teach-in mode
