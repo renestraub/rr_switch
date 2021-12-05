@@ -79,9 +79,7 @@ static state_t stateTeachin(const SOS_Message *pMsg)
   case Evt_TickerLED: // Toggle LED to indicate teach-in mode
     on = !on;
     IO_SetDebugLED(on);
-
-    static const SOS_Message msg2 = {Evt_TickerLED, 0};
-    SOS_StartTimer(Timer_Main250, 250, Process_Main, &msg2);
+    SOS_RestartTimer(Timer_Main250, 250);
     break;
 
   default:
@@ -138,8 +136,7 @@ static state_t stateOperational(const SOS_Message *pMsg)
 
   case Evt_TickerServo:
   {
-    static const SOS_Message msg = {Evt_TickerServo, 0};
-    SOS_StartTimer(Timer_Main50, 50, Process_Main, &msg);
+    SOS_RestartTimer(Timer_Main50, 50);
 
     auto old_pos = current_pos;
     if (current_pos < set_pos)

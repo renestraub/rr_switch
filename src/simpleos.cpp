@@ -125,6 +125,16 @@ void SOS_StartTimer(SOS_TimerId timerId, uint32_t milliSecs, SOS_ProcessId proce
 
 //----------------------------------------------------------------------------
 
+void SOS_RestartTimer(SOS_TimerId timerId, uint32_t milliSecs)
+{
+  SOS_Timer *pTimer = &sos_Timers[timerId];
+
+  pTimer->tmr_Time = TMR_StartInterval(milliSecs);
+  pTimer->tmr_Active = true;
+}
+
+//----------------------------------------------------------------------------
+
 void SOS_StopTimer(SOS_TimerId timerId)
 {
   SOS_Timer *pTimer = &sos_Timers[timerId];

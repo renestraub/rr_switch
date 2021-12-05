@@ -72,6 +72,8 @@ struct SOS_Message
  */
 void SOS_StartTimer(SOS_TimerId timerId, uint32_t milliSecs, SOS_ProcessId processId, const SOS_Message *pMsg);
 
+void SOS_RestartTimer(SOS_TimerId timerId, uint32_t milliSecs);
+
 /**
  * Stops a timer.
  *
