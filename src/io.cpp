@@ -57,8 +57,8 @@ static IO_DigInState io_InputState[IO_Inputs_Max];
 static const IO_EventMap io_InputMsgMap[IO_Inputs_Max] =
     {
         // Process to notify, Event, AutoRepeat, Change to '0', Change to '1'
-        {Process_Main, Evt_KeyLeft, 50, IO_INPUT_INACTIVE, IO_INPUT_ACTIVE},
-        {Process_Main, Evt_KeyRight, 50, IO_INPUT_INACTIVE, IO_INPUT_ACTIVE},
+        {Process_Main, Evt_KeyLeft, 250, IO_INPUT_INACTIVE, IO_INPUT_ACTIVE},
+        {Process_Main, Evt_KeyRight, 250, IO_INPUT_INACTIVE, IO_INPUT_ACTIVE},
         {Process_Main, Evt_KeyMode, 0, IO_INPUT_INACTIVE, IO_INPUT_ACTIVE},
 };
 

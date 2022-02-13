@@ -9,15 +9,11 @@
 
 //--- defines ----------------------------------------------------------------
 
-
 //--- types ------------------------------------------------------------------
-
 
 //--- variables --------------------------------------------------------------
 
-
 //--- local functions --------------------------------------------------------
-
 
 //--- OS interface -----------------------------------------------------------
 
@@ -26,12 +22,10 @@ void TERM_Run(void)
   /* Called on every process loop */
 
   /* See if we received a character on the USB terminal */
-  if (Serial.available() > 0) {
+  if (Serial.available() > 0)
+  {
     uint8_t incomingByte = Serial.read();
-
-    SOS_Message msg;
-    msg.msg_Event = Evt_Char;
-    msg.msg_Param1 = incomingByte;
+    SOS_Message msg = {Evt_Char, incomingByte};
     SOS_PostEvent(Process_Main, msg);
   }
 }

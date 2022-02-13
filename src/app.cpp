@@ -32,9 +32,15 @@ static const int SERVO_STEP = 1;
 static const int SERVO_STEP_RUN = 1;
 
 // Absolute limit for servo movement in programming mode
+static const int SERVO_ZERO_POS = 90;
+
+static const int SERVO_ANGLE = 10;
+static const int SERVO_ANGLE_LEFT = SERVO_ZERO_POS - SERVO_ANGLE;
+static const int SERVO_ANGLE_RIGHT = SERVO_ZERO_POS + SERVO_ANGLE;
+
 static const int SERVO_MAX_ANGLE = 20;
-static const int SERVE_MAX_ANGLE_LEFT = 90 - SERVO_MAX_ANGLE;
-static const int SERVE_MAX_ANGLE_RIGHT = 90 + SERVO_MAX_ANGLE;
+static const int SERVO_MAX_ANGLE_LEFT = SERVO_ZERO_POS - SERVO_MAX_ANGLE;
+static const int SERVO_MAX_ANGLE_RIGHT = SERVO_ZERO_POS + SERVO_MAX_ANGLE;
 
 //--- variables --------------------------------------------------------------
 
@@ -43,12 +49,13 @@ static Servo myservo;
 
 // Servo position for switch left/right position. Can be modified in
 // programming mode
-static int left_pos = 80;
-static int right_pos = 100;
+static int left_pos = SERVO_ANGLE_LEFT;
+static int right_pos = SERVO_ANGLE_RIGHT;
 
+// Current switch & servo position
 static position_t switch_pos = UNKNOWN;
-static int current_pos = 90;
-static int set_pos = 90;
+static int current_pos = SERVO_ZERO_POS;
+static int set_pos = SERVO_ZERO_POS;
 
 //--- local functions --------------------------------------------------------
 
@@ -60,7 +67,7 @@ static void setServoPos(int pos)
 
 static void setServoPosUnlimited(int pos)
 {
-  current_pos = constrain(pos, SERVE_MAX_ANGLE_LEFT, SERVE_MAX_ANGLE_RIGHT);
+  current_pos = constrain(pos, SERVO_MAX_ANGLE_LEFT, SERVO_MAX_ANGLE_RIGHT);
   myservo.write(current_pos);
 }
 
@@ -114,19 +121,18 @@ static state_t stateTeachin(const SOS_Message *pMsg)
     }
     else if (pMsg->msg_Param1 == 'x')
     {
-      // TODO: Save settings to EEPROM
       bool save = false;
 
       switch (switch_pos)
       {
       case LEFT:
-        Serial.println("Updating left limits");
+        Serial.println("Updating left limit");
         left_pos = set_pos = current_pos;
         save = true;
         break;
 
       case RIGHT:
-        Serial.println("Updating right limits");
+        Serial.println("Updating right limit");
         right_pos = set_pos = current_pos;
         save = true;
         break;
@@ -138,7 +144,7 @@ static state_t stateTeachin(const SOS_Message *pMsg)
 
       if (save)
       {
-        Serial.println(String("Saving limits ") + String(left_pos) + "," + String(right_pos));
+        Serial.println(String("Saving limits ") + String(left_pos) + ", " + String(right_pos));
 
         // TODO: refactor to settings functions
 
@@ -190,7 +196,7 @@ static state_t stateTeachin(const SOS_Message *pMsg)
 
 static void showMainMenu()
 {
-  Serial.println("Programming menu");
+  Serial.println("Main menu");
   Serial.println(" h: show this help");
   Serial.println(" l: switch left");
   Serial.println(" r: switch right");
@@ -349,8 +355,8 @@ void APP_Init()
     Serial.println(String("Restoring limits ") + String(left) + "," + String(right));
 
     // TODO: Sanity check --> max limits, left > right or similar
-    left_pos = left;
-    right_pos = right;
+    left_pos = constrain(left, SERVO_MAX_ANGLE_LEFT, SERVO_MAX_ANGLE_RIGHT);
+    right_pos = constrain(right, SERVO_MAX_ANGLE_LEFT, SERVO_MAX_ANGLE_RIGHT);
   }
   else
   {
