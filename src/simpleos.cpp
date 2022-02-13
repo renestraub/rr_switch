@@ -5,6 +5,7 @@
 
 #include "timer.h" // Timer system
 #include "io.h"
+#include "terminal.h"
 #include "app.h"
 
 #include "simpleos.h" // Own header file
@@ -196,6 +197,7 @@ void SOS_Schedule(void)
   /* Call all run functions unconditionally */
 
   IO_Run();
+  TERM_Run();
 
   /* Distribute events to processes */
 
@@ -234,6 +236,7 @@ void SOS_Init(void)
 
   TMR_Init(); // Start Timer system
   IO_Init();
+  TERM_Init();
   APP_Init();
 }
 

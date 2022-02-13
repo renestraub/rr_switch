@@ -41,11 +41,15 @@ enum SOS_Event
 {
   Evt_None,
   Evt_Enter,
-  Evt_KeyMode,
+
+  Evt_Char,     /* Character, typically keypress from terminal */
+  Evt_KeyMode,  /* Hardware key for mode change */
   Evt_KeyLeft,
   Evt_KeyRight,
-  Evt_TickerServo,
+
+  Evt_TickerServo,  /* Timer, tickers */
   Evt_TickerLED,
+
   Evt_MAX
 };
 
